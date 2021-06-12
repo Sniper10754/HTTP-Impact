@@ -27,8 +27,8 @@ public class HTTPHelper {
             outputStream.write(("Content-Length: " + ArrayHelper.measureByteContentLength(page.getCorrespondentContent()) + "\n\n").getBytes(encoding));
 
             for (byte[] forLine : page.getCorrespondentContent()) {
-                /**
-                 * now in a for loop we write all the content
+                /*
+                  now in a for loop we write all the content
                  */
                 outputStream.write((new String(forLine) + "\n").getBytes(encoding));
             }

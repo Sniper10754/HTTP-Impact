@@ -9,22 +9,22 @@ import java.util.InputMismatchException;
 public class Route {
     private final HTTPPage page;
     private ArrayList<byte[]> correspondentArr;
-    final protected ArrayList<byte[]> originalCorrespondentArr;
+    private final ArrayList<byte[]> originalCorrespondentArr;
     private String requestedURL;
     private final Thread updateThread = new Thread(this::updateFunction);
     private Runnable updateAction;
 
     public void updateFunction() {
-        if (updateAction == null)
-            this.updateThread.interrupt();
+        if (getUpdateAction() == null)
+            this.getUpdateThread().interrupt();
         else {
-            while (true) {
+            while (!this.getUpdateThread().isInterrupted()) {
                 try {
                     Thread.sleep(1000);
-                    updateAction.run();
+                    getUpdateAction().run();
                 } catch (Exception e) {
                     System.err.println("In UpdateThread action an error raised: \n" + e);
-                    this.updateThread.interrupt();
+                    this.getUpdateThread().interrupt();
                 }
             }
         }
@@ -49,16 +49,16 @@ public class Route {
             originalCorrespondentArr = page.getCorrespondentContent();
         } else
             throw new IllegalArgumentException("Route content type can't be empty/blank.");
-        this.updateThread.start();
+        this.getUpdateThread().start();
     }
 
     public void resetCorrespondentArr() {
-        this.setCorrespondentArr(this.originalCorrespondentArr);
+        this.setCorrespondentArr(this.getOriginalCorrespondentArr());
     }
 
     @Deprecated
     public void stopUpdateThread() {
-        this.updateThread.interrupt();
+        this.getUpdateThread().interrupt();
     }
 
     public void reset() {
@@ -66,7 +66,7 @@ public class Route {
     }
 
     public String getContentType() {
-        return page.getContentType();
+        return getPage().getContentType();
     }
 
     public String getRequestedURL() {
@@ -74,7 +74,7 @@ public class Route {
     }
 
     public void setContentType(String contentType) {
-        this.page.setContentType(contentType);
+        this.getPage().setContentType(contentType);
     }
 
     public void setRequestedURL(String requestedURL) {
@@ -82,11 +82,11 @@ public class Route {
     }
 
     public ArrayList<byte[]> getCorrespondentArr() {
-        return page.getCorrespondentContent();
+        return getPage().getCorrespondentContent();
     }
 
     public void setCorrespondentArr(ArrayList<byte[]> correspondentArr) {
-        this.page.setCorrespondentContent(correspondentArr);
+        this.getPage().setCorrespondentContent(correspondentArr);
     }
 
     public Runnable getUpdateAction() {
@@ -99,5 +99,13 @@ public class Route {
 
     public HTTPPage getPage() {
         return page;
+    }
+
+    public ArrayList<byte[]> getOriginalCorrespondentArr() {
+        return originalCorrespondentArr;
+    }
+
+    public Thread getUpdateThread() {
+        return updateThread;
     }
 }

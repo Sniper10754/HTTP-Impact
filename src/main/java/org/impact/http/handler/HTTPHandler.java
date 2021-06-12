@@ -38,11 +38,11 @@ public abstract class HTTPHandler {
             ArrayList<byte[]> contentOfNotFoundPage = new ArrayList<>();
             contentOfNotFoundPage.add("404".getBytes(StandardCharsets.UTF_8));
 
-            /**
-             * If you ask why theres a class that contains variables, these variables
-             * are referenced during the Indexing part with @param contentHashMap
-             * and a forEach() requires final variables, by moving the variables into a container
-             * you resolve the problem.
+            /*
+              If you ask why theres a class that contains variables, these variables
+              are referenced during the Indexing part with @param contentHashMap
+              and a forEach() requires final variables, by moving the variables into a container
+              you resolve the problem.
              */
 
             class varContainer {
@@ -55,22 +55,22 @@ public abstract class HTTPHandler {
 
             container.NotFoundPage = new HTTPPage(contentOfNotFoundPage, "text");
 
-            /**
-             * Here's the indexing part
-             * see JavaDoc down below for more info.
+            /*
+              Here's the indexing part
+              see JavaDoc down below for more info.
              */
 
             try (BufferedReader reader = new BufferedReader(new InputStreamReader(inputStream))) {
 
                 while ((infoLine = reader.readLine()) != null) {
-                    /**
-                     * when the browsers finish to send data, they send empty
-                     * bytes to indicate this.
+                    /*
+                      when the browsers finish to send data, they send empty
+                      bytes to indicate this.
                      */
                     if (infoLine.trim().isEmpty())
                         break;
-                    /**
-                     * if the sent line starts with GET, we take it and parse to get requested URL.
+                    /*
+                      if the sent line starts with GET, we take it and parse to get requested URL.
                      */
                     if (infoLine.startsWith("GET"))
                         rawRequestedUrl = infoLine;
@@ -78,8 +78,8 @@ public abstract class HTTPHandler {
                         request = infoLine;
                 }
 
-                /**
-                 * now we parse the request.
+                /*
+                  now we parse the request.
                  */
 
                 requestedUrl = HTTPRequestParser.parseGETRequest(rawRequestedUrl);
@@ -94,10 +94,11 @@ public abstract class HTTPHandler {
                     }
                 });
 
-                /**
-                 * now we are indexing the contentHashMap for searching the 404 Page
-                 * and the correspondent page (That will be sent if the url is correspondent to Route.correspondentURL)
+                /*
+                  now we are indexing the contentHashMap for searching the 404 Page
+                  and the correspondent page (That will be sent if the url is correspondent to Route.correspondentURL)
                  */
+                int status = -1;
                 if (! rawRequestedUrl.equals("") || (request.equals(""))) {
                     try {
                         container.correspondentPage = container.currentRoute.getPage();
@@ -121,9 +122,9 @@ public abstract class HTTPHandler {
                                 System.out.println("\"" + rawRequestedUrl + "\"" + " Has been requested by: " + SocketHelper.getRemoteIP(s).replace("/", "").replace("0:0:0:0:0:0:0:1", "127.0.0.1") + ":" + s.getLocalPort());
 
                                 if (container.correspondentPage instanceof HTTPImage)
-                                    HTTPHelper.sendGETResponse(responseCode, container.correspondentPage, s, Charset.defaultCharset());
+                                    status = HTTPHelper.sendGETResponse(responseCode, container.correspondentPage, s, Charset.defaultCharset());
                                 else
-                                    HTTPHelper.sendGETResponse(responseCode, container.correspondentPage, s, StandardCharsets.UTF_8);
+                                    status = HTTPHelper.sendGETResponse(responseCode, container.correspondentPage, s, StandardCharsets.UTF_8);
                                 break;
                             case 404:
                                 System.err.println("\"" + rawRequestedUrl + "\"" + " Has been requested by: " + SocketHelper.getRemoteIP(s).replace("/", "").replace("0:0:0:0:0:0:0:1", "127.0.0.1") + ":" + s.getLocalPort());
@@ -134,13 +135,11 @@ public abstract class HTTPHandler {
                                 }
 
                                 if (container.correspondentPage instanceof HTTPImage)
-                                    HTTPHelper.sendGETResponse(responseCode, container.correspondentPage, s, Charset.forName(System.getProperty("file.encoding")));
+                                    status = HTTPHelper.sendGETResponse(responseCode, container.correspondentPage, s, Charset.forName(System.getProperty("file.encoding")));
                                 else
-                                    HTTPHelper.sendGETResponse(responseCode, container.correspondentPage, s, StandardCharsets.UTF_8);
-
+                                    status = HTTPHelper.sendGETResponse(responseCode, container.correspondentPage, s, StandardCharsets.UTF_8);
                                 break;
                             default:
-
                                 break;
                         }
                     } else //noinspection StatementWithEmptyBody
@@ -149,17 +148,22 @@ public abstract class HTTPHandler {
                         }
                 }
 
-                /**
-                 * now we flush the OutputStream so it makes less system calls
+                if (status != 0) {
+                    throw new IOException();
+                }
+
+
+                /*
+                  now we flush the OutputStream so it makes less system calls
                  */
 
                 outputStream.flush();
 
-                /**
-                 * If the response is 404, it will be passed null as Route, so avoid
-                 * making errors and use an if to check if the Route is null
-                 *
-                 *    if (route != null) {...}
+                /*
+                  If the response is 404, it will be passed null as Route, so avoid
+                  making errors and use an if to check if the Route is null
+
+                     if (route != null) {...}
                  */
 
                 try {
