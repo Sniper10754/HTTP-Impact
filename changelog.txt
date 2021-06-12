@@ -1,0 +1,8 @@
+0.0.1
+
+* Basic features
+
+0.0.2
+
+* Added config file
+* Various glitch/bug fix
