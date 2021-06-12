@@ -17,16 +17,16 @@ public class ServerRoute {
     }
 
     public static void setRoute(Route route) {
-        /**
-         * we setup some exceptions for the cases
+        /*
+          we setup some exceptions for the cases
          */
 
         InputMismatchException ex = new InputMismatchException("Path Doesn't start with \"/\"");
         InputMismatchException dex = new InputMismatchException("Duplicated Route inserted");
 
         if (route.getRequestedURL().startsWith("/404")) {
-            /**
-             * we OverWrite the 404 Default page
+            /*
+              we OverWrite the 404 Default page
              */
             routeLists.remove("/404");
             routeLists.put(route.getRequestedURL(), route);

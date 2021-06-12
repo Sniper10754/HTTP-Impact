@@ -1,8 +1,5 @@
 package org.impact.helpers;
 
-import javax.imageio.ImageIO;
-import javax.imageio.stream.ImageInputStream;
-import java.io.File;
 import java.io.FileInputStream;
 import java.io.IOException;
 import java.io.InputStreamReader;
@@ -18,7 +15,7 @@ public class ArrayListHelper {
 
 
     public static ArrayList<byte[]> readFromFile(String filepath, Charset charset) {
-        try (FileInputStream _reader = new FileInputStream(new File(filepath))) {
+        try (FileInputStream _reader = new FileInputStream(filepath)) {
             InputStreamReader reader = new InputStreamReader(_reader, charset);
             ArrayList<byte[]> bytes = new ArrayList<>();
             ArrayList<Byte> readedBytes = new ArrayList<>();
@@ -29,7 +26,7 @@ public class ArrayListHelper {
 
 
             String[] strings;
-            Byte[] originalReadedBytes = readedBytes.toArray(new Byte[readedBytes.size()]);
+            Byte[] originalReadedBytes = readedBytes.toArray(new Byte[0]);
             int j=0;
             byte[] finalBytes = new byte[originalReadedBytes.length];
 
@@ -59,7 +56,7 @@ public class ArrayListHelper {
 
 
             String[] strings;
-            Byte[] originalReadedBytes = readedBytes.toArray(new Byte[readedBytes.size()]);
+            Byte[] originalReadedBytes = readedBytes.toArray(new Byte[0]);
             int j=0;
             byte[] finalBytes = new byte[originalReadedBytes.length];
 
